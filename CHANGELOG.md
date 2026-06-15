@@ -40,3 +40,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Compute the **empirical capture-ratio spread** for a major US grid (CAISO) using only the public OASIS API.
 - Distribute the pipeline as a single-author, **zero-funds reproducible artifact** (free data + free Python venv + cc-by-licensed code).
 - Frame the number as the **value of dispatchability** that coal/gas plants implicitly receive and renewables implicitly pay for — i.e., the answer to the user's original question.
+
+## [0.2.0] - 2026-06-14
+
+### Added
+- `scripts/fetch_eia_930_fuel.py` — EIA-930 hourly generation by fuel type fetcher (free API key)
+- `scripts/compute_fuel_capture_ratios.py` — fuel-level capture ratio computation
+- `data/raw/eia930_fuel_CAL_2024-06.csv.gz` — 5,760 rows (8 fuel types × 30 days × 24 hours)
+- `results/fuel_capture_ratios_2024-06.csv` and `.md` — fuel-level results
+
+### Verified findings
+- **Dispatchability premium: +0.321** (dispatchable vs intermittent fuels, gen-weighted)
+- **Solar capture ratio: 0.713** — lowest of all fuels (duck curve penalty)
+- **Natural gas capture ratio: 1.149** — earns 15% above grid average
+- **Nuclear capture ratio: 1.000** — exactly 1.0 by definition (flat baseload)
+- **Wind capture ratio: 1.044** — CAISO wind blows during higher-price evening hours
+- **On a $23/MWh grid: $7.52/MWh premium for dispatchable power**
+- 720 hours of CAISO LMP data joined with 720 hours of EIA-930 fuel data — clean alignment after UTC→local timezone conversion
+
+### What changed from v0.1.0
+- v0.1.0 measured the premium at the *trading-hub* level (0.33 spread across geographic nodes)
+- v0.2.0 measures it at the *fuel-type* level (0.32 spread between dispatchable and intermittent)
+- The two measurements agree (0.33 ≈ 0.32), confirming the node-level spread was a good proxy
+- v0.2.0 is the *better* measurement because it separates dispatchable from intermittent *within the same hours*
